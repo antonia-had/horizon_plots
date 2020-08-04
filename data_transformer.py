@@ -1,3 +1,5 @@
+import numpy as np
+
 class DataTransformer:
 
   def __init__(self, y, bands):
@@ -78,8 +80,8 @@ class DataTransformer:
     band: maximum number of y-values divided by the number of bands.
     max/min is set according to the values in data  """
 
-    self.max = max(max(data))
-    self.min = min(min(data))
+    self.max = np.amax(data)
+    self.min = np.amin(data)
 
     if abs(self.max ) > abs(self.min):
       self.min = self.max * -1

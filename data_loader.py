@@ -1,48 +1,28 @@
-import csv
+import pandas
+import numpy as np
 
 class DataLoader:
 
-  def write_to_disk(self, writer,typ,x,y):
-    writer.writerow(["x","y","type"])
-    for i in range(len(x)):
-      writer.writerow([x[i],y[i],typ])
-
   def read_csv(self,filename):
-    x = []
-    y = []
-    spamReader = csv.reader(open("data/"+filename,"rb"))
-    spamReader.next()
-    for row in spamReader:
-      x.append(float(row[0]))
-      y.append(float(row[1]))
-    return x,y
+    data = pandas.read_csv("./data/"+filename, index_col=0)
+    y = data.values
+    x = data.index
+    labels=data.columns.values
+    return x, y, labels
 
-  def get_data(self):
-    y_all = []
+  def get_data(self, datasets=['simulatedflowdata.csv', 'observedflowdata.csv']):
+    '''
+    Load two datasets by name and estimate difference between two.
+    I'm using % difference here, but any other kind works.
+    NEED TO IMPLEMENT: check for differences in x and labels between the two datasets
 
-    x, y = self.read_csv("apple_out_rel.csv")
-    x, y1 = self.read_csv("bmw_out_rel.csv")
-    x, y2 = self.read_csv("google_out_rel.csv")
-    x, y3 = self.read_csv("goldman_out_rel.csv")
-    x, y4 = self.read_csv("shell_out_rel.csv")
-    x, y5 = self.read_csv("agu_out_rel.csv")
-    x, y6 = self.read_csv("staples_out_rel.csv")
-    x, y7 = self.read_csv("yahoo_out_rel.csv")
-    x, y8 = self.read_csv("cabot_out_rel.csv")
-    x, y9 = self.read_csv("france_telekom_out_rel.csv")
+    :param datasets: list of csv filenames to load and plot difference
+    :return: x-axis labels, difference (y), and labels for each panel
+    '''
+    x1, y1, labels1 = self.read_csv(datasets[0])
+    x1, y2, labels2 = self.read_csv(datasets[1])
 
-    y_all.append(y5)
-    y_all.append(y)
-    y_all.append(y8)
-    y_all.append(y1)
-    y_all.append(y9)
-    y_all.append(y2)
-    y_all.append(y3)
-    y_all.append(y4)
-    y_all.append(y6)
-    y_all.append(y7)
+    y_diff = np.divide(y1-y2,y2, out=np.zeros_like(y2,dtype=float), where=y2!=0)
 
-    labels = ["Agu", "Apple", "Cabot", "BMW", 'France Telekom', 'Google', 'Goldman', 'Shell',  "Staples", "Yahoo"]
-
-    return x,y_all, labels
+    return x1,y_diff, labels1
 
